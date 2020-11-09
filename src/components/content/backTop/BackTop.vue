@@ -6,7 +6,6 @@
 <script>
 export default {
   name: "BackTop",
-  methods: {},
 };
 </script>
 <style scoped>

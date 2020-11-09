@@ -16,7 +16,6 @@
 <script>
 export default {
   name: "TabControl",
-  //   子组件向父组件传递信息
   props: {
     titles: {
       type: Array,
@@ -33,6 +32,7 @@ export default {
   methods: {
     itemClick(index) {
       this.currentIndex = index;
+      // 将点击事件发送给Home,Home动态决定展示的数据
       this.$emit("tabClick", index);
     },
   },

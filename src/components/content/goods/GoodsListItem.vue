@@ -1,9 +1,13 @@
 <template>
   <div class="goods-item" @click="itemClick">
+    <!-- 图片的展示 ,@load对图片进行监听-->
     <img :src="showImage" alt="" @load="imageLoad" />
     <div class="goods-info">
+      <!-- 图片的描述 -->
       <p>{{ goodsItem.title }}</p>
+      <!-- 图片价格 -->
       <span class="price">{{ goodsItem.price }}</span>
+      <!-- 收藏 -->
       <span class="collect">{{ goodsItem.cfav }}</span>
     </div>
   </div>
@@ -27,7 +31,6 @@ export default {
   },
   methods: {
     imageLoad() {
-      //发射事件给Home.vue
       this.$bus.$emit("itemImageLoad");
     },
     // 跳转到对应的详情页
@@ -76,7 +79,7 @@ export default {
 .goods-info .collect {
   position: relative;
 }
-
+/* 收藏图标 */
 .goods-info .collect::before {
   content: "";
   position: absolute;

@@ -4,7 +4,7 @@
     <div v-for="(item, index) in $store.state.cartList" :key="index">
       {{ item }}
     </div>
-    <scroll class="content">
+    <scroll class="content" ref="scroll">
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
@@ -32,12 +32,15 @@ import {
   Shop,
   GoodsParam,
   getRecommend,
-} from "../../components/network/detail";
+} from "components/network/detail";
 
-import Scroll from "../../components/common/scroll/Scroll";
-import GoodsList from "../../components/content/goods/GoodsList";
+import Scroll from "components/common/scroll/Scroll";
+import GoodsList from "components/content/goods/GoodsList";
+import { debounce } from "common/utils";
+import { itemListenerMixin } from "common/mixin";
 export default {
   name: "Detail",
+  mixins: [itemListenerMixin],
   data() {
     return {
       iid: null,
@@ -49,6 +52,7 @@ export default {
       commentInfo: {},
       recommends: [],
       themeTopYs: [0, 1000, 1000, 1000],
+      itemImgListener: null,
     };
   },
   components: {
@@ -60,13 +64,13 @@ export default {
     DetailParamInfo,
     DetailCommentInfo,
     DetailBottomBar,
-
     Scroll,
     GoodsList,
   },
   methods: {
     titleClick(index) {
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200);
+      // console.log(index);
     },
     addToCart() {
       //获取购物车需要展示的信息
@@ -123,6 +127,10 @@ export default {
       this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
       this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
     });
+  },
+  mounted() {},
+  destroyed() {
+    this.$bus.$off("itemImgLoad", this.itemImgListener);
   },
 };
 </script>

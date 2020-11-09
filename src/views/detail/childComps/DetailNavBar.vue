@@ -32,7 +32,7 @@ export default {
     titleClick(index) {
       this.currentIndex = index;
       // 将标题的点击事件发射出去
-      this.$emit("titClick", index);
+      this.$emit("titleClick", index);
     },
     backClick() {
       this.$router.back();

@@ -41,15 +41,16 @@
 import NavBar from "components/common/navbar/NavBar";
 import HomeSwiper from "./childComps/HomeSwiper";
 import RecommendView from "./childComps/RecommendView";
-import Scroll from "../../components/common/scroll/Scroll";
+import Scroll from "components/common/scroll/Scroll";
 // 和业务有关的组件
 import FeatureView from "./childComps/FeatureView";
-import TabControl from "../../components/content/tabControl/TabControl";
-import GoodsList from "../../components/content/goods/GoodsList";
-import BackTop from "../../components/content/backTop/BackTop";
+import TabControl from "components/content/tabControl/TabControl";
+import GoodsList from "components/content/goods/GoodsList";
+import BackTop from "components/content/backTop/BackTop";
 // 其他组件
-import { getHomeMultidata, getHomeGoods } from "../../components/network/home";
-import { debounce } from "../../common/utils";
+import { getHomeMultidata, getHomeGoods } from "components/network/home";
+import { debounce } from "common/utils";
+import { itemListenerMixin } from "common/mixin";
 
 // import BScroll from "better-scroll";
 export default {
@@ -64,9 +65,9 @@ export default {
     Scroll,
     BackTop,
   },
+  mixins: [itemListenerMixin],
   data() {
     return {
-      // result: null,
       banners: [],
       recommends: [],
       goods: {
@@ -77,10 +78,10 @@ export default {
       // 当前类型，默认设置为pop
       currentType: "pop",
       isShowBackTop: false,
-      // 页面滚动距离
       tabOffsetTop: 0,
       isTabFixed: false,
       saveY: 0,
+      itemImgListener: null,
     };
   },
   destroyed() {
@@ -94,7 +95,10 @@ export default {
   },
   // 离开时记录位置
   deactivated() {
+    //1.保存位置
     this.saveY = this.$refs.scroll.getScrollY();
+    //2.取消全局事件的监听
+    this.$bus.$off("itemImgLoad", this.itemImgListener);
   },
 
   // 什么时候发送网络请求？组件一创建好就发送网络请求，使用created声明周期函数
@@ -106,23 +110,12 @@ export default {
     this.getHomeGoods("new");
     this.getHomeGoods("sell");
   },
-  mounted() {
-    // 1.图片加载完成的事件监听
-    const refresh = debounce(this.$refs.scroll.refresh, 50);
-    // 3.进行监听来自GoodsListItem发射出来的事件----->监听item中图片加载完成
-    this.$bus.$on("itemImageLoad", () => {
-      // this.scroll && this.$refs.scroll.scroll.refresh();
-      // 调用防抖动函数
-      refresh();
-    });
-    // 2.获取tabControl的offsetTop
-    // console.log(this.$refs.tabControl2.$el);
-  },
+  mounted() {},
   methods: {
     //事件监听相关的方法
-
     tabClick(index) {
       // console.log(index);
+      // 根据index决定是新款、流行、精选数据
       switch (index) {
         case 0:
           this.currentType = "pop";
@@ -146,7 +139,7 @@ export default {
     },
     // 监听滚动
     contentScroll(position) {
-      // 判断backTop是否显示
+      // 根据position的值确定按钮是否显示
       this.isShowBackTop = -position.y > 1000;
       // 判断tabControl是否吸顶----->是否有position:fixed
       this.isTabFixed = -position.y > this.tabOffsetTop;
@@ -196,7 +189,6 @@ export default {
 .home-nav {
   background-color: var(--color-tint);
   color: #fff;
-
   position: fixed;
   left: 0;
   right: 0;
