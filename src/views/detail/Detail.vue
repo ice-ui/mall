@@ -4,11 +4,19 @@
     <div v-for="(item, index) in $store.state.cartList" :key="index">
       {{ item }}
     </div>
-    <scroll class="content" ref="scroll">
+    <scroll
+      class="content"
+      ref="scroll"
+      :probe-type="3"
+      @scroll="contentScroll"
+    >
       <detail-swiper :top-images="topImages" />
       <detail-base-info :goods="goods" />
       <detail-shop-info :shop="shop" />
-      <detail-goods-info :detail-info="detailInfo" />
+      <detail-goods-info
+        :detail-info="detailInfo"
+        @detailImageLoad="detailImageLoad"
+      />
       <detail-param-info ref="params" :param-info="paramInfo" />
       <detail-comment-info ref="comment" :comment-info="commentInfo" />
       <goods-list ref="recommend" :goods="recommends" />
@@ -51,8 +59,9 @@ export default {
       paramInfo: {},
       commentInfo: {},
       recommends: [],
-      themeTopYs: [0, 1000, 1000, 1000],
       itemImgListener: null,
+      themeTopYs: [],
+      getThemeTopY: null,
     };
   },
   components: {
@@ -68,6 +77,10 @@ export default {
     GoodsList,
   },
   methods: {
+    detailImageLoad() {
+      this.newRefresh();
+      this.getThemeTopY();
+    },
     titleClick(index) {
       this.$refs.scroll.scrollTo(0, -this.themeTopYs[index], 200);
       // console.log(index);
@@ -80,9 +93,12 @@ export default {
       product.desc = this.detailInfo.desc;
       product.price = this.detailInfo.realPrice;
       product.iid = this.iid;
-      //将商品添加到购物车里面
-      // this.$store.commit("addCart", product);
+      // 将商品添加到购物车里
       this.$store.dispatch("addCart", product);
+    },
+    contentScroll(position) {
+      const positionY = -position.y;
+      // 将posiition的y和主题中的值进行对比
     },
   },
   created() {
@@ -118,15 +134,26 @@ export default {
     getRecommend().then((res) => {
       this.recommends = res.data.data.list;
     });
-    //获取商品、评论等的offsetTop值
+    /*  获取商品、评论等的offsetTop值
     this.$nextTick(() => {
-      // 根据最新的数据，对应的DOM已经加载完成，但是图片还没有加载完成，所以获取的高度不一定正确
+       根据最新的数据，对应的DOM已经加载完成，但是图片还没有加载完成，所以获取的高度不一定正确
       this.themeTopYs = [];
       this.themeTopYs.push(0);
       this.themeTopYs.push(this.$refs.params.$el.offsetTop);
       this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
       this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
-    });
+      console.log(this.themeTopsYs);
+    }); */
+    //给getThemeTopY赋值(对给themeTopYs赋值的操作进行防抖)
+    //防抖的目的是提高性能：为了让我们做某个操作的时候过于频繁的去做
+    this.getThemeTopY = debounce(() => {
+      this.themeTopYs = [];
+      this.themeTopYs.push(0);
+      this.themeTopYs.push(this.$refs.params.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+      this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+      console.log(this.themeTopsYs);
+    }, 100);
   },
   mounted() {},
   destroyed() {

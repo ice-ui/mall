@@ -26,6 +26,7 @@ export default {
   name: "DetailBottomBar",
   methods: {
     addToCart() {
+      // console.log("点击添加到购物车");
       this.$emit("addCart");
     },
   },
@@ -39,24 +40,20 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-
   display: flex;
   text-align: center;
+  z-index: 999;
 }
-
 .bar-item {
   flex: 1;
   display: flex;
 }
-
 .bar-item > div {
   flex: 1;
 }
-
 .bar-left .text {
   font-size: 13px;
 }
-
 .bar-left .icon {
   display: block;
   width: 22px;
@@ -64,26 +61,21 @@ export default {
   margin: 10px auto 3px;
   background: url("~assets/img/detail/detail_bottom.png") 0 0/100%;
 }
-
 .bar-left .service {
   background-position: 0 -54px;
 }
-
 .bar-left .shop {
   background-position: 0 -98px;
 }
-
 .bar-right {
   font-size: 15px;
   color: #fff;
   line-height: 58px;
 }
-
 .bar-right .cart {
   background-color: #ffe817;
   color: #333;
 }
-
 .bar-right .buy {
   background-color: #f69;
 }
